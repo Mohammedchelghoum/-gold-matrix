@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0e27">
+    
+    <title>محطة الذهب الملكية</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(180deg, #0a0e27 0%, #1a1f3d 50%, #0f1535 100%);
+            min-height: 100vh;
+            color: white;
+            padding-bottom: 100px;
+        }
+        
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 5px 20px rgba(255,215,0,0.3);
+        }
+        
+        .signal-card {
+            margin: 20px;
+            padding: 30px 25px;
+            border-radius: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .signal-card.buy {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            box-shadow: 0 25px 50px -12px rgba(16,185,129,0.5);
+        }
+        
+        .signal-card.sell {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            box-shadow: 0 25px 50px -12px rgba(239,68,68,0.5);
+        }
+        
+        .pulse-ring {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+        }
+        
+        .pulse-ring::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        .signal-badge {
+            background: rgba(0,0,0,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .signal-type {
+            font-size: 56px;
+            font-weight: 900;
+            margin: 10px 0;
+        }
+        
+        .signal-strength {
+            font-size: 28px;
+            font-weight: 700;
+            opacity: 0.95;
+        }
+        
+        .confidence-box {
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .confidence-bar {
+            flex: 1;
+            height: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: white;
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+        
+        .confidence-text {
+            font-size: 42px;
+            font-weight: 900;
+            min-width: 80px;
+        }
+        
+        .levels {
+            margin: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 25px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .level-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        
+        .level-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .level-row:last-child {
+            border-bottom: none;
+        }
+        
+        .level-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .level-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .level-icon.blue { background: rgba(59,130,246,0.2); }
+        .level-icon.red { background: rgba(239,68,68,0.2); }
+        .level-icon.green { background: rgba(16,185,129,0.2); }
+        
+        .level-label {
+            color: #9ca3af;
+            font-size: 13px;
+        }
+        
+        .level-sublabel {
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        
+        .level-value {
+            font-size: 28px;
+            font-weight: 900;
+        }
+        
+        .entry { color: #3b82f6; }
+        .stop { color: #ef4444; }
+        .target { color: #10b981; }
+        
+        .analyze-btn {
+            margin: 20px;
+            width: calc(100% - 40px);
+            padding: 22px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-size: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 15px 35px rgba(59,130,246,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .analyze-btn:active {
+            transform: scale(0.97);
+        }
+        
+        .price-ticker {
+            background: rgba(10,14,39,0.95);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .price-info h1 {
+            font-size: 32px;
+            font-weight: 900;
+        }
+        
+        .price-info span {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+        
+        .price-change {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 800;
+        }
+        
+        .positive { background: rgba(16,185,129,0.2); color: #10b981; }
+        .negative { background: rgba(239,68,68,0.2); color: #ef4444; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px;
+        }
+        
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 900;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-200px);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            padding: 18px 35px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 16px;
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 2000;
+        }
+        
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10,14,39,0.98);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0 25px;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .nav-item.active {
+            color: #3b82f6;
+        }
+        
+        .ai-analysis {
+            margin: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 25px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .ai-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .ai-title {
+            font-weight: 800;
+            font-size: 18px;
+        }
+        
+        .ai-subtitle {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+        
+        .ai-text {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #d1d5db;
+            text-align: justify;
+        }
+        
+        .indicators {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .indicator {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .indicator-label {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-bottom: 5px;
+        }
+        
+        .indicator-value {
+            font-size: 20px;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="price-ticker">
+        <div class="price-info">
+            <h1 id="livePrice">$2,045.30</h1>
+            <span>XAUUSD • M15</span>
+        </div>
+        <div class="price-change positive" id="priceChange">+0.45%</div>
+    </div>
+
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">👑</div>
+            <div>
+                <div style="font-size: 13px; color: #ffd700; font-weight: 800;">ROYAL GOLD MATRIX</div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">🟢 AI Active</div>
+            </div>
+        </div>
+        <div style="font-size: 22px;">⚙️</div>
+    </div>
+
+    <div class="signal-card buy" id="signalCard">
+        <div class="pulse-ring"></div>
+        <div class="signal-badge">🤖 XAUUSD AI</div>
+        <div class="signal-type" id="signalType">شراء</div>
+        <div class="signal-strength" id="signalStrength">قوي جداً</div>
+        <div class="confidence-box">
+            <div class="confidence-bar">
+                <div class="confidence-fill" id="confidenceBar" style="width: 87%"></div>
+            </div>
+            <div class="confidence-text" id="confidenceText">87%</div>
+        </div>
+    </div>
+
+    <div class="levels">
+        <div class="level-title">📊 مستويات التداول</div>
+        <div class="level-row">
+            <div class="level-info">
+                <div class="level-icon blue">🎯</div>
+                <div>
+                    <div class="level-label">سعر الدخول</div>
+                    <div class="level-sublabel entry">موصى به</div>
+                </div>
+            </div>
+            <div class="level-value entry" id="entryPrice">$2,042.50</div>
+        </div>
+        <div class="level-row">
+            <div class="level-info">
+                <div class="level-icon red">🛡️</div>
+                <div>
+                    <div class="level-label">وقف الخسارة</div>
+                    <div class="level-sublabel stop">حماية رأس المال</div>
+                </div>
+            </div>
+            <div class="level-value stop" id="stopLoss">$2,038.20</div>
+        </div>
+        <div class="level-row">
+            <div class="level-info">
+                <div class="level-icon green">💰</div>
+                <div>
+                    <div class="level-label">جني الأرباح</div>
+                    <div class="level-sublabel target">الهدف الأول</div>
+                </div>
+            </div>
+            <div class="level-value target" id="takeProfit">$2,052.80</div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-label">الدقة</div>
+            <div class="stat-value" style="color: #fbbf24;">89%</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-label">الزخم</div>
+            <div class="stat-value" style="color: #f97316;">قوي</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-icon">⚖️</div>
+            <div class="stat-label">المخاطرة</div>
+            <div class="stat-value" style="color: #10b981;">1:2.5</div>
+        </div>
+    </div>
+
+    <div class="ai-analysis">
+        <div class="ai-header">
+            <div class="ai-icon">🧠</div>
+            <div>
+                <div class="ai-title">تحليل الذكاء الاصطناعي</div>
+                <div class="ai-subtitle">GPT-4 Engine</div>
+            </div>
+        </div>
+        <div class="ai-text" id="aiText">
+            تم التعرف على اتجاه صعودي واضح. السعر يصنع قمم أعلى. مؤشر RSI عند 62 دون تشبع.
+        </div>
+        <div class="indicators">
+            <div class="indicator">
+                <div class="indicator-label">RSI</div>
+                <div class="indicator-value" style="color: #10b981;">62</div>
+            </div>
+            <div class="indicator">
+                <div class="indicator-label">MACD</div>
+                <div class="indicator-value" style="color: #10b981;">+0.45</div>
+            </div>
+            <div class="indicator">
+                <div class="indicator-label">EMA 50</div>
+                <div class="indicator-value" style="color: #3b82f6;">2040</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="analyze-btn" onclick="analyze()" id="analyzeBtn">
+        <span>🔄 تحليل جديد</span>
+    </button>
+
+    <div class="notification" id="notification">✅ تم التحديث!</div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active"><span>🏠</span><span>الرئيسية</span></div>
+        <div class="nav-item"><span>📈</span><span>التحليل</span></div>
+        <div class="nav-item"><span>🔔</span><span>التنبيهات</span></div>
+        <div class="nav-item"><span>📋</span><span>السجل</span></div>
+    </div>
+
+    <script>
+        let currentPrice = 2045.30;
+        
+        setInterval(() => {
+            const change = (Math.random() - 0.5) * 0.30;
+            currentPrice += change;
+            document.getElementById('livePrice').textContent = '$' + currentPrice.toFixed(2);
+            const changePercent = ((change / currentPrice) * 100);
+            const changeEl = document.getElementById('priceChange');
+            changeEl.textContent = (change >= 0 ? '+' : '') + changePercent.toFixed(2) + '%';
+            changeEl.className = 'price-change ' + (change >= 0 ? 'positive' : 'negative');
+        }, 2000);
+        
+        function analyze() {
+            const btn = document.getElementById('analyzeBtn');
+            btn.innerHTML = '<span class="loading"></span> جاري التحليل...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                const signals = [
+                    { type: 'شراء', strength: 'قوي جداً', class: 'buy', conf: 92 },
+                    { type: 'بيع', strength: 'قوي جداً', class: 'sell', conf: 89 },
+                    { type: 'انتظار', strength: 'حيادي', class: 'buy', conf: 50 }
+                ];
+                
+                const signal = signals[Math.floor(Math.random() * signals.length)];
+                const card = document.getElementById('signalCard');
+                card.className = 'signal-card ' + signal.class;
+                document.getElementById('signalType').textContent = signal.type;
+                document.getElementById('signalStrength').textContent = signal.strength;
+                document.getElementById('confidenceText').textContent = signal.conf + '%';
+                document.getElementById('confidenceBar').style.width = signal.conf + '%';
+                
+                const entry = currentPrice;
+                const stop = signal.type === 'شراء' ? entry - 4 : entry + 4;
+                const target = signal.type === 'شراء' ? entry + 10 : entry - 10;
+                
+                document.getElementById('entryPrice').textContent = '$' + entry.toFixed(2);
+                document.getElementById('stopLoss').textContent = '$' + stop.toFixed(2);
+                document.getElementById('takeProfit').textContent = '$' + target.toFixed(2);
+                
+                btn.innerHTML = '<span>🔄 تحليل جديد</span>';
+                btn.disabled = false;
+                
+                showNotification('✅ إشارة ' + signal.type + ' جديدة!');
+                if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+            }, 2000);
+        }
+        
+        function showNotification(text) {
+            const notif = document.getElementById('notification');
+            notif.textContent = text;
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 3000);
+        }
+        
+        setTimeout(analyze, 1000);
+    </script>
+</body>
+</html>
